@@ -36,21 +36,18 @@ int getId(){
 }
 
 void initthreads(void){
-	fprintf(stderr, "inicializando los hilos");
 	if(getcontext(&ttable[0].u_c))
-		err(1, "getcontext initthread");
+		err(1, "getcontext initthread\n\r)");
 	if(gettimeofday(&ttable[0].s_time, NULL))
-		err(1, "gettimeofday init");
+		err(1, "gettimeofday init\n\r)");
 	ttable[0].id = getId();
 	ttable[0].state = RUNNING;
-	fprintf(stderr, "inicializando los hilos");
 }
 
 int createthread(void (*mainf)(void*), void *arg, int stacksize) {
-	fprintf(stderr, "creando hilo...");
 	int tindex_void = -1;
 	for(int i = 0; i < MAX_THREAD; i++){
-		if(&ttable[i].state == AVILIABLE){
+		if(ttable[i].state == AVILIABLE){
 			tindex_void = i;
 			break; 
 		}
@@ -76,19 +73,21 @@ int createthread(void (*mainf)(void*), void *arg, int stacksize) {
 	ttable[tindex_void].u_c.uc_link = &ttable[current_thread].u_c;
 	ttable[tindex_void].state = READY;
 	makecontext(&ttable[tindex_void].u_c, (void(*))mainf, 1, arg);
-	fprintf(stderr, "hilo creado");
 	return ttable[tindex_void].id;
 } 
 
 void exitsthread(void) {
-	fprintf(stderr, "intentando finalizar el hilo");
 	ttable[current_thread].state = AVILIABLE;
 	yieldthread();
-	fprintf(stderr, "hilo finalizado");
+}
+
+void printthreads(){
+	for(int i = 0; i < MAX_THREAD;i++){
+		fprintf(stderr, "Hilo: %d\n\r\tEstado: %d\n\r",i,ttable[i].state);
+	}
 }
 
 int nextCT(){
-	fprintf(stderr, "buscando siguiente ct");
 	do {
 		if(current_thread + 1 == MAX_THREAD){
 			current_thread = 1;
@@ -96,44 +95,37 @@ int nextCT(){
 			current_thread ++;
 		}
 	} while(ttable[current_thread].state != READY);
-	fprintf(stderr, "encontrado el siguiente ct: %d", current_thread);
 	return current_thread;
 }
 
 int quantumSpent(){
-	fprintf(stderr, "quantum gastado.....");
 	if(ttable[current_thread].state == AVILIABLE){
 		return 1;
 	}
 	timeval t;
 	if(gettimeofday(&t, NULL)){
-		err(1, "gettimeofday");
+		err(1, "gettimeofday\n\r)");
 	}
 	long now = t.tv_usec / 1000 + t.tv_sec * 1000;
 	timeval t2 = ttable[current_thread].s_time;
 	long before = t2.tv_usec / 1000 + t2.tv_sec * 1000;
-	fprintf(stderr, "tiempo del cuantum: %ld", now-before);
 	return now - before > 200;
 }
 
 void yieldthread(void) {	
-	fprintf(stderr, "cambiando hilos...");
 	if(!quantumSpent()){
-		fprintf(stderr, "hilo no cambiado");
 		return;
 	}
 	int ct = current_thread;
 	int next_ct = nextCT();
 	if(gettimeofday(&ttable[ct].s_time, NULL)){
-		err(1, "gettimeofday");
+		err(1, "gettimeofday\n\r)");
 	}
 	ttable[ct].state = READY;
 	ttable[next_ct].state = RUNNING;
 	swapcontext(&ttable[ct].u_c, &ttable[next_ct].u_c);
-	fprintf(stderr, "hilo cambiado");
 }
 
 int curidthread(void) {
-	fprintf(stderr, "obteniendo id...");
 	return ttable[current_thread].id;
 }
