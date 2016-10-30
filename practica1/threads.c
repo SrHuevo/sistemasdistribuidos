@@ -139,23 +139,3 @@ void yieldthread(void) {
 int curidthread(void) {
 	return ttable[current_thread].id;
 }
-
-void suspendthread(void) {
-
-}
-
-int resumethread(int id) {
-
-}
-
-int suspendedthreads(int **list) {
-
-}
-
-int killthread(int id) {
-
-}
-
-void sleepthread(int msec) {
-
-}
