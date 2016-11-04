@@ -1,10 +1,10 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 	"sort"
-	"strings"
 )
 
 var words = make(map[string]int)
@@ -18,12 +18,15 @@ func check(e error) {
 func saveWordsFiles(v string) {
 	f, err := os.Open(v)
 	check(err)
+	defer f.Close()
 
-	b1 := make([]byte, 1024)
-	leidos, err := f.Read(b1)
-	check(err)
-	for _, v := range strings.Fields(string(b1[:leidos])) {
-		words[v]++
+	r := bufio.NewReader(f)
+	scan := bufio.NewScanner(r)
+
+	scan.Split(bufio.ScanWords)
+
+	for scan.Scan() {
+		words[scan.Text()]++
 	}
 }
 
