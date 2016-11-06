@@ -1,23 +1,37 @@
-package rendez_test
+package rendez
 
-import(
-	"./rendez",
-	"testing",
+import (
 	"fmt"
+	"sync"
+	"testing"
+	"time"
 )
 
-func dosomething(millisecs time.Duration, tag int) {
+var wg = &sync.WaitGroup{}
+
+func dosomething(millisecs time.Duration, tag int, debug string) {
+	fmt.Printf("Empieza: %s\r\n", debug)
 	duration := millisecs * time.Millisecond
 	time.Sleep(duration)
-	fmt.Println("Function in background, duration:", duration)
-	rendez.Rendezvous(tag,nil)
-	fmt.Println("Acaba hilo 1")
+	Rendezvous(tag, nil)
+	fmt.Printf("Acaba: %s\r\n", debug)
+	wg.Done()
 }
 
 func TestSimple(t *testing.T) {
-	dosomething(100, 1)
-	rendez.Rendezvous(2000,1)
-	fmt.Println("Acaba todo el programa")
+	wg.Add(1)
+	go dosomething(100, 1, "primero con tag 1")
+	wg.Add(1)
+	go dosomething(2000, 2, "primero con tag 2")
+	wg.Add(1)
+	go dosomething(300, 1, "segundo con tag 1")
+	wg.Add(1)
+	go dosomething(200, 3, "primero con tag 3")
+	wg.Add(1)
+	go dosomething(100, 2, "segundo con tag 2")
+	wg.Add(1)
+	go dosomething(400, 3, "segundo con tag 3")
 
-	time.Sleep(2000*time.Millisecond)
+	wg.Wait()
+	fmt.Println("Acaba todo el programa")
 }

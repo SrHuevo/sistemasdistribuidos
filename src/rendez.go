@@ -21,7 +21,6 @@ func Rendezvous(tag int, val interface{}) interface{} {
 		delete(rendezMap, tag)
 		mutex.Unlock()
 	} else {
-		rendezMap[tag] = new(cita)
 		rendezMap[tag].wg.Add(1)
 		rendezMap[tag].i = val
 		e = rendezMap[tag]
