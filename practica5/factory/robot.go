@@ -10,14 +10,14 @@ var nPrints int
 
 func Trabaja(idRobot string, ps *Piezas) {
 	nPrints = len(ps.cant)*2 + ps.total*2 + 2
-	piezasIds := make([]string, ps.total)
 	for {
-		getPiezas(piezasIds, ps)
-		makeMobile(idRobot, piezasIds, ps)
+		pids := getPiezas(ps)
+		makeMobile(idRobot, pids, ps)
 	}
 }
 
-func getPiezas(piezasIds []string, ps *Piezas) {
+func getPiezas(ps *Piezas) []string {
+	piezasIds := make([]string, ps.total)
 	cant := 0
 	for i, p := range ps.p {
 		for j := 0; j < ps.cant[i]; j++ {
@@ -25,6 +25,7 @@ func getPiezas(piezasIds []string, ps *Piezas) {
 			cant++
 		}
 	}
+	return piezasIds
 }
 
 func makeMobile(idRobot string, piezasIds []string, ps *Piezas) {

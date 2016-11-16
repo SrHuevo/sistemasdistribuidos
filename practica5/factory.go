@@ -1,8 +1,8 @@
 package main
 
 import (
-	"practica5/sem"
 	"practica5/factory"
+	"practica5/sem"
 )
 
 func main() {
