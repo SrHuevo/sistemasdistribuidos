@@ -10,17 +10,16 @@ func sEspera(r chan int) {
 	for ncnew := 1; ; ncnew++{
 		select {
 		case r <- ncnew:
-			fmt.Println("\tCliente ", ncnew, ": me siento en la sala de espera")
+			fmt.Println("Cliente ", ncnew, ": me siento en la sala de espera")
 		default:
-			fmt.Println("\t\t\tCliente ", ncnew, ": me voy de la barberia, esta llena")
+			fmt.Println("Cliente ", ncnew, ": me voy de la barberia, esta llena")
 		}
 		time.Sleep(1000 * time.Millisecond)
 	}
 }
 
 func recep(r, b1, b2 chan int) {
-	for {
-		c:= <-r
+	for c := range r {
 		select {
 		case b1 <- c:
 		case b2 <- c:
@@ -29,14 +28,13 @@ func recep(r, b1, b2 chan int) {
 }
 
 func sCorte(nb int, b chan int) {
-	for {
-		fmt.Println("Barbero ", nb, ": me duermo esperando clientes")
-		nc:= <-b
-		fmt.Println("\t\tCliente ", nc, ": me corto el pelo")
+	for nc := range b {
+		fmt.Println("Cliente ", nc, ": me corto el pelo")
 		fmt.Println("Barbero ", nb, ": empiezo a cortar el pelo")
 		time.Sleep(5000 * time.Millisecond)
 		fmt.Println("Cliente ", nc, ": termino de cortarme el pelo")
 		fmt.Println("Barbero ", nb, ": termino de cortar el pelo")
+		fmt.Println("Barbero ", nb, ": me duermo esperando clientes")
 	}
 }
 
