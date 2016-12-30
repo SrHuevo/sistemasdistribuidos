@@ -24,7 +24,7 @@ func superproceso(log string) {
 		}
 	}
 }
-
+//prueba
 func upProcess(log string, index int) {
 	chans[index] = make(chan int)
 	go run(log)
